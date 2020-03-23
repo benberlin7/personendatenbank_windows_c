@@ -56,7 +56,7 @@ int main(void)
 	struct personen *persPtr;
 	int i,chars;
 	
-	//intros
+	//intro
 	system("cls");
 	itwIntro(0,11);
 	delay(1000);
@@ -111,7 +111,7 @@ void neuePersonAnlegen(struct personen *persPtr)
 	{
 		datenLegende();
 		gotoxy(8,7);farbeWaehlen(3,0);printf("--------------------------------------------------");farbeWaehlen(6,0);
-		gotoxy(20,8);strcpy((*persPtr).vname,eingabeTextTab(MAX-1)); //gets((*persPtr).vname);
+		gotoxy(20,8);strcpy((*persPtr).vname,eingabeTextTab(MAX-1)); //alt: gets((*persPtr).vname);
 		gotoxy(20,9);strcpy((*persPtr).nname,eingabeTextTab(MAX-1));
 		gotoxy(20,10);strcpy((*persPtr).adresse,eingabeTextTab(MAX-1));
 		gotoxy(20,11);
@@ -189,7 +189,7 @@ void datenAuslesen(struct personen *persPtr)
 	fseek(datenbank, 0, SEEK_END); // seek to end of file
 	size = ftell(datenbank); // get current file pointer
 	fseek(datenbank, 0, SEEK_SET); // seek back to beginning of file
-	anz=size/sizeof(struct personen);
+	anz=size/sizeof(struct personen); //anzahl der Datensätze ermitteln
 
 	if((datenbank=fopen("datenbank.txt","r+"))==NULL)
 	{
@@ -224,7 +224,6 @@ void datenAuslesen(struct personen *persPtr)
 				if(sektion>4 && sektion<8)
 				{	
 					putch(temp);
-	//				printf("(z%d i%d)\n",z,i);
 					if(buchstabe>19) {buchstabe=1;printf("\n\t\t\t");sektion++;}
 					else buchstabe++;
 					
@@ -232,7 +231,6 @@ void datenAuslesen(struct personen *persPtr)
 				if(sektion==4)
 				{
 					putch(temp);
-	//				printf("(z%d_i%d)\n",z,i);
 					if(buchstabe>7) {buchstabe=1;printf("\n\t\t\t");sektion++;}
 					else buchstabe++;
 					
@@ -240,7 +238,6 @@ void datenAuslesen(struct personen *persPtr)
 				if(sektion>0 && sektion<4)
 				{
 					putch(temp);
-	//				printf("(z%d_i%d)\n",z,i);
 					if(buchstabe>47) {buchstabe=1;printf("\n\t\t\t");sektion++;}
 					else buchstabe++;				
 				}			
@@ -253,11 +250,10 @@ void datenAuslesen(struct personen *persPtr)
 			eingabe=getch();
 				switch(eingabe)
 				{
-					case 80:break; //runter
 					case 'v':if(struktur>1)struktur--;break; //links
 					case 'n':if(struktur<anz)struktur++;break; //rechts
 					case 'b':
-//Daten bearbeiten
+						//Daten bearbeiten
 						gotoxy(26,18);
 						farbeWaehlen(11,0); 
 						printf("[b] bearbeiten");
