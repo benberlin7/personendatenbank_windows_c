@@ -102,8 +102,9 @@ void neuePersonAnlegen(struct personen *persPtr)
 	
    	if((datenbank = fopen( "datenbank.txt" , "a" ))==NULL)
 	{
-		farbeWaehlen(3,0);
-		printf("Fehler beim Lesen der Datenbank");
+		gotoxy(18,22);
+		farbeWaehlen(7,4);
+		printf("Fehler beim lesen der Datenbank");
 		getch();
 		farbeWaehlen(6,0);
 	}
@@ -171,7 +172,7 @@ void neuePersonAnlegen(struct personen *persPtr)
 			gotoxy(20,15);strcpy((*persPtr).telefon,eingabeTextTab(15));
 			gotoxy(20,16);strcpy((*persPtr).email,eingabeTextTab(MAX-1));
 			gotoxy(26,21);farbeWaehlen(6,1);printf("\n\t\tEingabe speichern? (j/n)");farbeWaehlen(6,0);
-			if((auswahl=getch())=='j') 
+			if((auswahl=getch())=='j' || (auswahl=getch())==13) 
 			{
 				fwrite(persPtr, sizeof(struct personen), 1 , datenbank );
    				fclose(datenbank);
@@ -193,7 +194,11 @@ void datenAuslesen(struct personen *persPtr)
 
 	if((datenbank=fopen("datenbank.txt","r+"))==NULL)
 	{
+		gotoxy(18,22);
+		farbeWaehlen(7,4);
 		printf("Fehler beim lesen der Datenbank");
+		getch();
+		farbeWaehlen(6,0);
 	}
 	else
 	{
