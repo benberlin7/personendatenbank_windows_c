@@ -64,29 +64,29 @@ int main(void)
 	//Menü zeichnen
 	do
 	{
-	system("cls");
-	farbeWaehlen(6,0);
-	gotoxy(15,4);
-	printf("\n\n\n\n\t\t[n] Neue Person anlegen");
-	printf("\n\n\t\t[a] Datenbank ansehen und bearbeiten");	
-	printf("\n\n\t\t[ESC] Programm beenden");
-	menue();
-	persPtr=&pers;
-	eingabe=getch();
-	
-	if(eingabe=='n')
-	{
 		system("cls");
+		farbeWaehlen(6,0);
+		gotoxy(15,4);
+		printf("\n\n\n\n\t\t[n] Neue Person anlegen");
+		printf("\n\n\t\t[a] Datenbank ansehen und bearbeiten");	
+		printf("\n\n\t\t[ESC] Programm beenden");
 		menue();
-		neuePersonAnlegen(persPtr);
-	}
-	
-	if(eingabe=='a')
-	{
-		datenAuslesen(persPtr);
-	}
-	
-	
+		persPtr=&pers;
+		eingabe=getch();
+		
+		if(eingabe=='n')
+		{
+			system("cls");
+			menue();
+			neuePersonAnlegen(persPtr);
+		}
+		
+		if(eingabe=='a')
+		{
+			datenAuslesen(persPtr);
+		}
+		
+		
 	} while(eingabe!=27);
 	
 	//Programm Ende
