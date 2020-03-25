@@ -43,7 +43,7 @@ struct personen
 
 void menue();
 void neuePersonAnlegen(void);
-void datenAuslesen(struct personen*);
+void datenAuslesen(struct personen*,int);
 void datenFiltern(void);
 void datenLegende();
 
@@ -69,7 +69,7 @@ int main(void)
 		farbeWaehlen(6,0);
 		gotoxy(15,4);
 		printf("\n\n\n\n\t\t[n] Neue Person anlegen");
-		printf("\n\n\t\t[a] Datenbank ansehen und bearbeiten");	
+		printf("\n\n\t\t[a] Datenbank sichten und bearbeiten");	
 		printf("\n\n\t\t[f] Datenbank filtern");			
 		printf("\n\n\t\t[ESC] Programm beenden");
 		menue();
@@ -85,7 +85,7 @@ int main(void)
 		
 		if(eingabe=='a')
 		{
-			datenAuslesen(persPtr);
+			datenAuslesen(persPtr,1);
 		}
 		if(eingabe=='f')
 		{
@@ -189,18 +189,12 @@ void neuePersonAnlegen(void)
 	}
 }
 
-void datenAuslesen(struct personen *persPtr)
+void datenAuslesen(struct personen *persPtr,int struktur)
 {
-	FILE *datenbank = fopen("datenbank.txt", "r");
+	FILE *datenbank;
 	char temp,buchstabe=1,sektion=1,eingabe,eingabeBearb=0;
-	int zaehler=1,size=0,struktur=1,anz=1;
+	int zaehler=1,size=0,anz=1;
 	
-	//Größe der DB ermitteln
-	fseek(datenbank, 0, SEEK_END); // seek to end of file
-	size = ftell(datenbank); // get current file pointer
-	fseek(datenbank, 0, SEEK_SET); // seek back to beginning of file
-	anz=size/sizeof(struct personen); //anzahl der Datensätze ermitteln
-
 	if((datenbank=fopen("datenbank.txt","r+"))==NULL)
 	{
 		gotoxy(18,22);
@@ -211,6 +205,11 @@ void datenAuslesen(struct personen *persPtr)
 	}
 	else
 	{
+		//Größe der DB ermitteln
+		fseek(datenbank, 0, SEEK_END); // seek to end of file
+		size = ftell(datenbank); // get current file pointer
+		fseek(datenbank, 0, SEEK_SET); // seek back to beginning of file
+		anz=size/sizeof(struct personen); //anzahl der Datensätze ermitteln
 		do
 		{
 		system("cls");
@@ -259,16 +258,30 @@ void datenAuslesen(struct personen *persPtr)
 			menue();
 			if(struktur>1 && anz>1) {gotoxy(10,18);farbeWaehlen(6,0);printf("<< [v]");} else {gotoxy(10,18);farbeWaehlen(8,0);printf("<< [v]");} 
 			if(struktur>=1 && struktur<anz) {gotoxy(51,18);farbeWaehlen(6,0);printf("[n] >>");} else {gotoxy(51,18);farbeWaehlen(8,0);printf("[n] >>");}
-			gotoxy(26,18);farbeWaehlen(8,0);printf("[b] bearbeiten");farbeWaehlen(6,0);
-			gotoxy(26,19);farbeWaehlen(8,0);printf("[ESC] beenden");farbeWaehlen(6,0);
+			gotoxy(8,19);farbeWaehlen(8,0);printf("[b] bearbeiten");farbeWaehlen(6,0);
+			gotoxy(26,19);farbeWaehlen(8,0);printf("[s] springe zu ");farbeWaehlen(6,0);
+			gotoxy(45,19);farbeWaehlen(8,0);printf("[ESC] beenden");farbeWaehlen(6,0);
 			eingabe=getch();
 				switch(eingabe)
 				{
 					case 'v':if(struktur>1)struktur--;break; //links
 					case 'n':if(struktur<anz)struktur++;break; //rechts
+					case 's':
+						gotoxy(26,19);farbeWaehlen(11,0);printf("[s] springe zu");
+						do
+						{
+							gotoxy(41,19);
+							eingabe=eingabeZahl(3);
+							gotoxy(25,22);
+							if(eingabe>=anz) printf("(!Eingabe zu gross)");
+							if(eingabe<1) printf("(!Eingabe zu klein)");
+						} while (eingabe<1 || eingabe>=anz+1);
+						datenAuslesen(persPtr,eingabe);
+						eingabe=27;
+						break;	
 					case 'b':
 						//Daten bearbeiten
-						gotoxy(26,18);
+						gotoxy(8,19);
 						farbeWaehlen(11,0); 
 						printf("[b] bearbeiten");
 						gotoxy(6,8);printf(">");
@@ -365,19 +378,22 @@ void datenFiltern(void)
 	FILE *datenbankFilter; //= fopen("datenbank.txt", "r");
 	char auswahl,modus;
 	char filterKriterium[20]={"0"};
-	int zaehler=0,i=0;
+	int zaehler=0,i=0,anz,size;
 	struct personen *persPtr;
 	struct personen persFilter;
 	persPtr=&persFilter;
 	system("cls");
 	menue();
 	
-	gotoxy(8,8);printf("Wonach soll gesucht werden?");
+	gotoxy(8,8);
+	farbeWaehlen(3,0);
+	printf("Wonach soll gesucht werden?");
+	farbeWaehlen(6,0);
 	printf("\n\t[1] Fach [2] Vorname [3] Nachname [ESC] Abbruch");
 	modus=getch();
 	if(modus=='1')
 	{
-	farbeWaehlen(3,0);
+	farbeWaehlen(11,0);
 	gotoxy(0,9);
 	printf("\t[1] Fach");
 	farbeWaehlen(6,0);
@@ -403,7 +419,7 @@ void datenFiltern(void)
 	}
 	if(modus=='2')
 	{
-	farbeWaehlen(3,0);
+	farbeWaehlen(11,0);
 	gotoxy(17,9);
 	printf("[2] Vorname ");
 	farbeWaehlen(6,0);
@@ -415,13 +431,13 @@ void datenFiltern(void)
 	}
 	if(modus=='3')
 	{
-	farbeWaehlen(3,0);
+	farbeWaehlen(11,0);
 	gotoxy(29,9);
 	printf("[3] Nachname ");
 	farbeWaehlen(6,0);
 	printf("[ESC] Abbruch");
 	farbeWaehlen(3,0);
-	printf("\n\n\tNacname eingeben: ");
+	printf("\n\n\tNachname eingeben: ");
 	strcpy(filterKriterium,eingabeTextTab(MAX-1));
 	farbeWaehlen(6,0);
 	}
@@ -437,51 +453,77 @@ void datenFiltern(void)
 		}
 		else
 		{
+			//Größe der DB ermitteln
+			fseek(datenbankFilter, 0, SEEK_END); // seek to end of file
+			size = ftell(datenbankFilter); // get current file pointer
+			fseek(datenbankFilter, 0, SEEK_SET); // seek back to beginning of file
+			anz=size/sizeof(struct personen); //anzahl der Datensätze ermitteln
+	
 			system("cls");
 			menue();
 			gotoxy(8,8);farbeWaehlen(3,0);printf("Filtern nach : %s 					\n\t--------------------------------------------------",filterKriterium);
+			gotoxy(8,19);farbeWaehlen(8,0);printf("[s] Springe zu Nummer ");
 			farbeWaehlen(6,0);
-			while(fread(persPtr,sizeof(struct personen),1,datenbankFilter))
+			while((fread(persPtr,sizeof(struct personen),1,datenbankFilter)) && auswahl!='s') 
 			{
-				if(i>8)
-				{
-					gotoxy(7,22);farbeWaehlen(6,1);
-					printf("Beliebige Taste drucken um naechste Seite anzuzeigen");
-					getch();
-					farbeWaehlen(6,0);
-					i=0;
-					system("cls");
-					menue();
-					gotoxy(8,8);farbeWaehlen(3,0);printf("Filtern nach : %s 					\n\t--------------------------------------------------",filterKriterium);
-					farbeWaehlen(6,0);
-				}
-				gotoxy(8,10+i);
-
-				if(modus=='1' && ((strcmp(persFilter.erstesfach, filterKriterium) == 0) || (strcmp(persFilter.zweitesfach, filterKriterium) == 0) || (strcmp(persFilter.drittesfach, filterKriterium) == 0))) 
-				{
-					printf("#%d %s %s :",zaehler+1,persFilter.vname,persFilter.nname);
-					if(strcmp(persFilter.erstesfach, filterKriterium) == 0) {farbeWaehlen(3,0);printf(" %s ",persFilter.erstesfach);farbeWaehlen(6,0);} else printf(" %s ",persFilter.erstesfach);
-					if(strcmp(persFilter.zweitesfach, filterKriterium) == 0) {farbeWaehlen(3,0);printf(" %s ",persFilter.zweitesfach);farbeWaehlen(6,0);} else printf(" %s ",persFilter.zweitesfach);
-					if(strcmp(persFilter.drittesfach, filterKriterium) == 0) {farbeWaehlen(3,0);printf(" %s ",persFilter.drittesfach);farbeWaehlen(6,0);} else printf(" %s ",persFilter.drittesfach);
-					i++;
-				}
-				if(modus=='2' && (strcmp(persFilter.vname, filterKriterium) == 0)) 
-				{
-					printf("#%d ",zaehler+1);
-					farbeWaehlen(3,0); printf("%s ",persFilter.vname);
-					farbeWaehlen(6,0); printf("%s : %s %s %s",persFilter.nname,persFilter.erstesfach,persFilter.zweitesfach,persFilter.drittesfach);
-					i++;
-				}
-				if(modus=='3' && (strcmp(persFilter.nname, filterKriterium) == 0)) 
-				{
-					printf("#%d %s ",zaehler+1,persFilter.vname);
-					farbeWaehlen(3,0); printf("%s ",persFilter.nname);
-					farbeWaehlen(6,0); printf(": %s %s %s",persFilter.erstesfach,persFilter.zweitesfach,persFilter.drittesfach);
-					i++;
-				}
-				zaehler++;
+					gotoxy(8,10+i);
+	
+					if(modus=='1' && ((strcmp(persFilter.erstesfach, filterKriterium) == 0) || (strcmp(persFilter.zweitesfach, filterKriterium) == 0) || (strcmp(persFilter.drittesfach, filterKriterium) == 0))) 
+					{
+						printf("#%d %s %s :",zaehler+1,persFilter.vname,persFilter.nname);
+						if(strcmp(persFilter.erstesfach, filterKriterium) == 0) {farbeWaehlen(3,0);printf(" %s ",persFilter.erstesfach);farbeWaehlen(6,0);} else printf(" %s ",persFilter.erstesfach);
+						if(strcmp(persFilter.zweitesfach, filterKriterium) == 0) {farbeWaehlen(3,0);printf(" %s ",persFilter.zweitesfach);farbeWaehlen(6,0);} else printf(" %s ",persFilter.zweitesfach);
+						if(strcmp(persFilter.drittesfach, filterKriterium) == 0) {farbeWaehlen(3,0);printf(" %s ",persFilter.drittesfach);farbeWaehlen(6,0);} else printf(" %s ",persFilter.drittesfach);
+						i++;
+					}
+					if(modus=='2' && (strcmp(persFilter.vname, filterKriterium) == 0)) 
+					{
+						printf("#%d ",zaehler+1);
+						farbeWaehlen(3,0); printf("%s ",persFilter.vname);
+						farbeWaehlen(6,0); printf("%s : %s %s %s",persFilter.nname,persFilter.erstesfach,persFilter.zweitesfach,persFilter.drittesfach);
+						i++;
+					}
+					if(modus=='3' && (strcmp(persFilter.nname, filterKriterium) == 0)) 
+					{
+						printf("#%d %s ",zaehler+1,persFilter.vname);
+						farbeWaehlen(3,0); printf("%s ",persFilter.nname);
+						farbeWaehlen(6,0); printf(": %s %s %s",persFilter.erstesfach,persFilter.zweitesfach,persFilter.drittesfach);
+						i++;
+					}
+					zaehler++;
+					if(i>7)
+					{
+						gotoxy(7,22);farbeWaehlen(6,1);
+						printf("Beliebige Taste drucken um naechste Seite anzuzeigen");
+						auswahl=getch();
+						if(auswahl!='s')
+						{
+							farbeWaehlen(6,0);
+							i=0;
+							system("cls");
+							menue();
+							gotoxy(8,8);farbeWaehlen(3,0);printf("Filtern nach : %s 					\n\t--------------------------------------------------",filterKriterium);
+							gotoxy(8,19);farbeWaehlen(8,0);printf("[s] Springe zu Nummer ");
+							farbeWaehlen(6,0);
+						}
+					}
 			}
-			getch();
+			if(i<1) printf("(Keine Treffer)");
+			if(auswahl!='s') auswahl=getch();
+			if(auswahl=='s')
+			{
+				gotoxy(8,19);farbeWaehlen(11,0);printf("[s] Springe zu Nummer ");
+				do
+				{
+					gotoxy(30,19);
+					auswahl=eingabeZahl(3);
+					gotoxy(25,23);
+					if(auswahl>=anz) printf("(!Eingabe zu gross)");
+					if(auswahl<1) printf("(!Eingabe zu klein)");
+				} while(auswahl<1 || auswahl>anz+1);
+				datenAuslesen(persPtr,auswahl);				
+			}
+
 			fclose(datenbankFilter);
 		}
 	}			
